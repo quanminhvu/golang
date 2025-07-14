@@ -1,0 +1,28 @@
+version: '3.8'
+
+networks:
+  backend-network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-1
+    restart: always
+    environment:
+      POSTGRES_USER: quanvm
+      POSTGRES_PASSWORD: 098poiA@
+      POSTGRES_DB: golang-db
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./db/postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quanvm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
