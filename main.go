@@ -1,13 +1,31 @@
 package main
 
-import "fmt"
+import (
+	"database/sql"
+	"log"
 
-func split(sum int) (x, y int) {
-	x = sum * 4 / 9
-	y = sum - x
-	return
-}
+	_ "github.com/lib/pq"
+	"github.com/quanminhvu/golang/api"
+	db "github.com/quanminhvu/golang/database/sqlc"
+)
+
+const (
+	dbDriver      = "postgres"
+	dbSource      = "postgresql://quanvm:098poiA@@localhost:5432/golang-db?sslmode=disable"
+	serverAddress = "0.0.0.0:8080"
+)
 
 func main() {
-	fmt.Println(split(17))
+	conn, err := sql.Open(dbDriver, dbSource)
+	if err != nil {
+		log.Fatal("cannot connect to db:", err)
+	}
+
+	store := db.NewStore(conn)
+	server := api.NewServer(store)
+
+	err = server.Start(serverAddress)
+	if err != nil {
+		log.Fatal("cannot start server:", err)
+	}
 }
